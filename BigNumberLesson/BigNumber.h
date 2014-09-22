@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <string>
 
 using namespace std; 
 
@@ -8,24 +9,25 @@ class CBigNumber
 {
 
 public:
-	static const int DIGITCOUNT = 5;
+	static const int DIGITCOUNT = 10;
 
-
+	CBigNumber(string&);
 	CBigNumber(char*);
-	CBigNumber(int);
+	CBigNumber(int i = 0);
 	~CBigNumber();
 
+	friend istream& operator>>(istream& lop, CBigNumber& rop); 
+	friend ostream& operator<<(ostream& lop, const CBigNumber& rop); 
 
-	//friend istream& operator>>(istream& a, char*& b);
-	friend CBigNumber& operator>>(istream& in, char*& b); 
 
-
+	
 private:
 
-	int m_digits[DIGITCOUNT];
+	unsigned int m_digits[DIGITCOUNT];
 	int m_validDigits = 3;
-	int m_base = 10;
+	int m_base = 2;
 	bool m_positive;
+	
 	/*
 	CBigNumber(CBigNumber&);
 	CBigNumber(char*); 

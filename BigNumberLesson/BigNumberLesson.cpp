@@ -3,18 +3,18 @@
 
 #include "stdafx.h"
 #include "BigNumber.h"
-
+#include <iostream>
 
 //CBigNumber bignumber(12345);
-
-char* chars = new char[CBigNumber::DIGITCOUNT]; 
 
 
 int _tmain(int argc, _TCHAR* argv[])
 {
 
-	cin >> chars; 
+	CBigNumber bignumber;
 
+	cin >> bignumber; 
+	cout << bignumber; 
+	
 	return 0;
 }
-
