@@ -11,10 +11,13 @@
 int _tmain(int argc, _TCHAR* argv[])
 {
 
-	CBigNumber bignumber;
+	CBigNumber bignumberSmall(50);
+	CBigNumber bignumberBig(100);
 
-	cin >> bignumber; 
-	cout << bignumber; 
+	if (bignumberSmall < 10) 
+	{
+		cout << "Small ist kleiner"; 
+	}
 	
 	return 0;
 }

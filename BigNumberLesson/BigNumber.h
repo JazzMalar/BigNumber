@@ -16,6 +16,11 @@ public:
 	CBigNumber(int i = 0);
 	~CBigNumber();
 
+	CBigNumber& operator+=(const CBigNumber&);
+	CBigNumber& operator-=(const CBigNumber&);
+	bool operator>(const CBigNumber&) const; 
+	bool operator<(const CBigNumber&) const; 
+
 	friend istream& operator>>(istream& lop, CBigNumber& rop); 
 	friend ostream& operator<<(ostream& lop, const CBigNumber& rop); 
 
@@ -35,8 +40,7 @@ private:
 	CBigNumber();
 	
 	CBigNumber operator+(const CBigNumber); 
-	CBigNumber& operator+=(const CBigNumber) const;
-
+	
 	CBigNumber operator*(const CBigNumber); 
 	CBigNumber& operator*=(const CBigNumber) const; 
 	*/

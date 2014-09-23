@@ -50,6 +50,69 @@ CBigNumber::CBigNumber(int number)
 
 CBigNumber::CBigNumber(string& str) : CBigNumber(*(str.c_str())) { }
 
+CBigNumber& CBigNumber::operator-=(const CBigNumber& rop)
+{
+
+}
+
+CBigNumber& CBigNumber::operator+=(const CBigNumber& rop)
+{
+
+	if (*this < 0)
+	{
+		if (*this < rop)
+		{
+			return (*this -= rop); 
+		}
+
+
+
+	}
+
+	for (int i = 0; i < DIGITCOUNT; i++)
+	{
+		m_digits[i] += rop.m_digits[i]; 
+	}
+
+	return *this; 
+}
+
+bool CBigNumber::operator<(const CBigNumber& rop) const
+{
+	bool result = false; 
+	int posLeft = 0; 
+	int posRight = 0; 
+
+	for (int i = 0; i < DIGITCOUNT; i++)
+	{
+		if (this->m_digits[i] > 0) posLeft = i; 
+		if (rop.m_digits[i] > 0) posRight = i; 
+	}
+
+	if (posLeft < posRight)
+	{
+		result = true; 
+	}
+	else if (posLeft > posRight)
+	{
+		result = false; 
+	}
+	else
+	{
+		if (this->m_digits[posLeft] < rop.m_digits[posRight])
+		{
+			result = true; 
+		}
+	}
+
+	return result; 
+}
+
+bool CBigNumber::operator>(const CBigNumber& rop) const
+{
+	return !(*this < rop); 
+}
+
 CBigNumber::CBigNumber(char* arr)
 {
 
@@ -123,7 +186,7 @@ istream& operator>>(std::istream& lop, CBigNumber& rop)
 	*/
 	
 	// CHAR ARRAY VERSION 
-	char* inputData = new char[CBigNumber::DIGITCOUNT];
+	char* inputData = new char[CBigNumber::DIGITCOUNT+1];
 
 	std::cout << "Grosse Zahl eingeben :" << endl;
 	lop >> inputData; 
