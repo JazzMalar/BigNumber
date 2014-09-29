@@ -31,21 +31,27 @@ CBigNumber::CBigNumber(int number)
 	}
 	*/
 
-	unsigned int digitsToConsider = 1; 
+	unsigned int digitsToConsider = 0; 
 
 	for (int i = 0; i < DIGITCOUNT; i++)
 	{
-		rest = number % m_base;
-		m_digits[i] = rest; 
-		number /= m_base; 
 
 		if (number != 0)
 		{
-			digitsToConsider++; 
+			rest = number % m_base;
+			m_digits[i] = rest;
+			digitsToConsider++;
+			number /= m_base;
 		}
+		else
+		{
+			m_digits[i] = 0;
+		}
+
+
 	}
 
-	m_validDigits = digitsToConsider + 1; 
+	m_validDigits = digitsToConsider; 
 
 	/* DEBUG */
 	/*
@@ -61,7 +67,90 @@ CBigNumber::CBigNumber(string& str) : CBigNumber(*(str.c_str())) { }
 
 CBigNumber& CBigNumber::operator-=(const CBigNumber& rop)
 {
+	// ToDo :  implement
 	return *this;
+}
+
+CBigNumber& CBigNumber::operator*=(const CBigNumber& rop)
+{
+	const int arrSize = this->m_validDigits+1; 
+	CBigNumber* tmpArr = new CBigNumber[arrSize]; 
+	CBigNumber* tmpArrOrig = tmpArr; 
+
+	for (int i = 0; i < arrSize; i++)
+	{
+		*tmpArr = CBigNumber(0); 
+		tmpArr++; 
+	}
+
+	tmpArr = tmpArrOrig; 
+
+	CBigNumber tmp(0);
+	const unsigned int *pDigitsRop = rop.m_digits;
+	unsigned int *pDigitsLop = this->m_digits;
+	unsigned int *pDigitsTmp = tmp.m_digits;
+	unsigned int digitsToConsider = 0;
+
+	digitsToConsider = this->m_validDigits;
+
+	unsigned int runningBase = this->m_base;
+	unsigned int newValue = 0;
+	unsigned int rest = 0;
+	this->m_validDigits = 0; 
+	
+	for (unsigned int i = 0; i <= digitsToConsider; i++)
+	{
+		pDigitsTmp = tmp.m_digits + i;
+		pDigitsRop = rop.m_digits;
+		rest = 0; 
+		
+		tmp = 0;
+
+		tmp.m_validDigits = rop.m_validDigits + i + 1; 
+
+		for (int j = 0; j <= rop.m_validDigits; j++)
+		{		
+
+			newValue = *pDigitsLop * *pDigitsRop + rest;
+			if (newValue >= runningBase)
+			{
+				rest = newValue / runningBase;
+				newValue %= runningBase;
+			}
+
+			*pDigitsTmp = newValue;
+			pDigitsRop++;
+			pDigitsTmp++; 
+
+		}
+
+		*tmpArr = tmp; 
+		tmpArr++; 
+
+		pDigitsLop++;
+
+	}
+
+	tmpArr = tmpArrOrig; 
+
+	*this = 0; 
+	for (int i = 0; i < arrSize; i++)
+	{
+		*this += *tmpArr;
+		tmpArr++; 
+	}
+
+	delete [] tmpArrOrig;
+
+
+	return *this; 
+
+}
+
+CBigNumber CBigNumber::operator*(const CBigNumber& rop) const
+{
+	CBigNumber tmp(*this); 
+	return tmp *= rop; 
 }
 
 CBigNumber CBigNumber::operator+(const CBigNumber& rop) const 
@@ -90,6 +179,8 @@ CBigNumber& CBigNumber::operator+=(const CBigNumber& rop)
 		}
 		*/
 
+		// ToDo :  implement
+
 		return *this;
 
 	}
@@ -104,6 +195,8 @@ CBigNumber& CBigNumber::operator+=(const CBigNumber& rop)
 		digitsToConsider = rop.m_validDigits;
 	}
 
+
+	this->m_validDigits = 0; 
 	unsigned int runningBase = this->m_base; 
 	unsigned int *pDigitsLop = m_digits; 
 	const unsigned int *pDigitsRop = rop.m_digits; 
@@ -114,7 +207,7 @@ CBigNumber& CBigNumber::operator+=(const CBigNumber& rop)
 		newValue = *pDigitsLop + *pDigitsRop + rest;
 		rest = 0; 
 
-		if (newValue > runningBase)
+		if (newValue >= runningBase)
 		{
 			rest = 1; 
 			newValue -= runningBase; 
@@ -125,6 +218,23 @@ CBigNumber& CBigNumber::operator+=(const CBigNumber& rop)
 
 		pDigitsLop++; 
 		pDigitsRop++; 
+
+		if (newValue > 0)
+		{
+			this->m_validDigits = i + 1; 
+		}
+
+		/*
+		//this->m_validDigits++;
+
+		// In case we prepared a position for a new digit
+		// but didn't create one, reduce the valid digits again.
+		if (i == digitsToConsider && newValue == 0)
+		{
+			this->m_validDigits--;
+		}
+
+		*/
 
 	}
 

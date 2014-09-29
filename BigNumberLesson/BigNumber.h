@@ -1,4 +1,6 @@
 #pragma once
+#ifndef __BIGNUMBER__H
+#define __BIGNUMBER_H
 
 #include <iostream>
 #include <string>
@@ -9,13 +11,15 @@ class CBigNumber
 {
 
 public:
-	static const int DIGITCOUNT = 1000;
+	static const int DIGITCOUNT = 10;
 
 	CBigNumber(string&);
 	CBigNumber(char*);
 	CBigNumber(int i = 0);
 	~CBigNumber();
 
+	CBigNumber& operator*=(const CBigNumber&); 
+	CBigNumber operator*(const CBigNumber&) const; 
 	CBigNumber& operator+=(const CBigNumber&);
 	CBigNumber operator+(const CBigNumber&) const;
 	CBigNumber& operator-=(const CBigNumber&);
@@ -50,5 +54,5 @@ private:
 };
 
 
-
+#endif
 
