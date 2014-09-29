@@ -31,20 +31,29 @@ CBigNumber::CBigNumber(int number)
 	}
 	*/
 
+	unsigned int digitsToConsider = 1; 
+
 	for (int i = 0; i < DIGITCOUNT; i++)
 	{
 		rest = number % m_base;
 		m_digits[i] = rest; 
 		number /= m_base; 
+
+		if (number != 0)
+		{
+			digitsToConsider++; 
+		}
 	}
 
-	/* DEBUG */
+	m_validDigits = digitsToConsider + 1; 
 
+	/* DEBUG */
+	/*
 	for (int i = 0; i < DIGITCOUNT; i++)
 	{
 		cout << m_digits[i] << endl;
 	}
-
+	*/
 
 }
 
@@ -52,26 +61,71 @@ CBigNumber::CBigNumber(string& str) : CBigNumber(*(str.c_str())) { }
 
 CBigNumber& CBigNumber::operator-=(const CBigNumber& rop)
 {
+	return *this;
+}
 
+CBigNumber CBigNumber::operator+(const CBigNumber& rop) const 
+{
+	CBigNumber temp(*this); 
+
+	return temp += rop; 
+
+	// return temp 
 }
 
 CBigNumber& CBigNumber::operator+=(const CBigNumber& rop)
 {
 
-	if (*this < 0)
+	if (this->m_positive != rop.m_positive)
 	{
-		if (*this < rop)
+		// ToDo : negative values are going to be fun
+		/*
+		if (this->m_positive)
 		{
 			return (*this -= rop); 
 		}
+		else 
+		{
+			return (rop -= *this); 
+		}
+		*/
 
-
+		return *this;
 
 	}
 
-	for (int i = 0; i < DIGITCOUNT; i++)
+	unsigned int digitsToConsider = 0; 
+	if (this->m_validDigits > rop.m_validDigits)
 	{
-		m_digits[i] += rop.m_digits[i]; 
+		digitsToConsider = this->m_validDigits; 
+	}
+	else
+	{
+		digitsToConsider = rop.m_validDigits;
+	}
+
+	unsigned int runningBase = this->m_base; 
+	unsigned int *pDigitsLop = m_digits; 
+	const unsigned int *pDigitsRop = rop.m_digits; 
+	unsigned int newValue = 0; 
+	unsigned int rest = 0; 
+	for (unsigned int i = 0; i <= digitsToConsider; i++)
+	{
+		newValue = *pDigitsLop + *pDigitsRop + rest;
+		rest = 0; 
+
+		if (newValue > runningBase)
+		{
+			rest = 1; 
+			newValue -= runningBase; 
+		}
+
+		*pDigitsLop = newValue; 
+		runningBase *= this->m_base;
+
+		pDigitsLop++; 
+		pDigitsRop++; 
+
 	}
 
 	return *this; 
@@ -80,28 +134,37 @@ CBigNumber& CBigNumber::operator+=(const CBigNumber& rop)
 bool CBigNumber::operator<(const CBigNumber& rop) const
 {
 	bool result = false; 
-	int posLeft = 0; 
-	int posRight = 0; 
 
-	for (int i = 0; i < DIGITCOUNT; i++)
-	{
-		if (this->m_digits[i] > 0) posLeft = i; 
-		if (rop.m_digits[i] > 0) posRight = i; 
-	}
-
-	if (posLeft < posRight)
-	{
-		result = true; 
-	}
-	else if (posLeft > posRight)
+	if (this->m_validDigits > rop.m_validDigits) 
 	{
 		result = false; 
 	}
+	else if (this->m_validDigits < rop.m_validDigits)
+	{
+		result = true; 
+	}
 	else
 	{
-		if (this->m_digits[posLeft] < rop.m_digits[posRight])
+		const unsigned int* pDigitLop = m_digits + m_validDigits - 1;
+		const unsigned int* pDigitRop = rop.m_digits + rop.m_validDigits - 1; 
+
+		for (int i = this->m_validDigits-1; i >= 0; i--)
 		{
-			result = true; 
+			if (*pDigitLop > *pDigitRop)
+			{
+				result = false;
+			}
+			else if (*pDigitLop < *pDigitRop)
+			{
+				result = true; 
+			}
+			else
+			{
+				result = false; 
+			}
+
+			pDigitLop--;
+			pDigitRop--;
 		}
 	}
 
@@ -110,7 +173,56 @@ bool CBigNumber::operator<(const CBigNumber& rop) const
 
 bool CBigNumber::operator>(const CBigNumber& rop) const
 {
-	return !(*this < rop); 
+
+	bool result = false;
+
+	if (this->m_validDigits > rop.m_validDigits)
+	{
+		result = true;
+	}
+	else if (this->m_validDigits < rop.m_validDigits)
+	{
+		result = false;
+	}
+	else
+	{
+		const unsigned int* pDigitLop = m_digits + m_validDigits - 1;
+		const unsigned int* pDigitRop = rop.m_digits + rop.m_validDigits - 1;
+
+		for (int i = this->m_validDigits - 1; i >= 0; i--)
+		{
+			if (*pDigitLop > *pDigitRop)
+			{
+				result = true;
+			}
+			else if (*pDigitLop < *pDigitRop)
+			{
+				result = false;
+			}
+			else
+			{
+				result = false;
+			}
+
+			pDigitLop--;
+			pDigitRop--;
+
+		}
+	}
+
+	return result;
+}
+
+bool CBigNumber::operator==(const CBigNumber& rop) const
+{
+	bool result = true;
+
+	if ((*this > rop) || (*this < rop))
+	{
+		result = false;
+	}
+
+	return result;
 }
 
 CBigNumber::CBigNumber(char* arr)
@@ -140,12 +252,13 @@ CBigNumber::CBigNumber(char* arr)
 	if (arrayLength >= (DIGITCOUNT + j))
 	{
 		endOfArray = arr + (DIGITCOUNT + j) - 1;
+		m_validDigits = DIGITCOUNT;
 	}
 	else
 	{
 		endOfArray = arr + arrayLength - 1;
+		m_validDigits = arrayLength - j; 
 	}
-
 
 	for (int i = DIGITCOUNT-1; i >= 0; i--)
 	{
