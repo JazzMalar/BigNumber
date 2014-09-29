@@ -85,10 +85,9 @@ CBigNumber& CBigNumber::operator*=(const CBigNumber& rop)
 
 	tmpArr = tmpArrOrig; 
 
-	CBigNumber tmp(0);
 	const unsigned int *pDigitsRop = rop.m_digits;
 	unsigned int *pDigitsLop = this->m_digits;
-	unsigned int *pDigitsTmp = tmp.m_digits;
+	unsigned int *pDigitsTmp = tmpArr->m_digits;
 	unsigned int digitsToConsider = 0;
 
 	digitsToConsider = this->m_validDigits;
@@ -100,13 +99,12 @@ CBigNumber& CBigNumber::operator*=(const CBigNumber& rop)
 	
 	for (unsigned int i = 0; i <= digitsToConsider; i++)
 	{
-		pDigitsTmp = tmp.m_digits + i;
+		pDigitsTmp = tmpArr->m_digits + i;
 		pDigitsRop = rop.m_digits;
 		rest = 0; 
 		
-		tmp = 0;
 
-		tmp.m_validDigits = rop.m_validDigits + i + 1; 
+		tmpArr->m_validDigits = rop.m_validDigits + i + 1; 
 
 		for (int j = 0; j <= rop.m_validDigits; j++)
 		{		
@@ -124,7 +122,6 @@ CBigNumber& CBigNumber::operator*=(const CBigNumber& rop)
 
 		}
 
-		*tmpArr = tmp; 
 		tmpArr++; 
 
 		pDigitsLop++;

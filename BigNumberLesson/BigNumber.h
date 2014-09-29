@@ -11,7 +11,7 @@ class CBigNumber
 {
 
 public:
-	static const int DIGITCOUNT = 10;
+	static const int DIGITCOUNT = 10000;
 
 	CBigNumber(string&);
 	CBigNumber(char*);
@@ -39,18 +39,6 @@ private:
 	int m_base = 10;
 	bool m_positive;
 	
-	/*
-	CBigNumber(CBigNumber&);
-	CBigNumber(char*); 
-
-	CBigNumber();
-	
-	CBigNumber operator+(const CBigNumber); 
-	
-	CBigNumber operator*(const CBigNumber); 
-	CBigNumber& operator*=(const CBigNumber) const; 
-	*/
-
 };
 
 
